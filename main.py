@@ -1,4 +1,5 @@
 import os
+import time
 import base64
 import requests
 from rubpy import Client, filters
@@ -34,26 +35,31 @@ def load_session():
 
 
 load_session()
-print("Starting Rubika listener...")
 
-bot = Client(name=SESSION_PATH)
-
-
-@bot.on_message_updates(filters.private)
-def on_private_message(update: Update):
+while True:
     try:
-        sender = getattr(update, 'author_title', None) or "ناشناس"
-        text = getattr(update, 'text', None) or "[پیام بدون متن]"
-        notify = (
-            f"📩 <b>پیام جدید در روبیکا</b>\n\n"
-            f"👤 <b>از:</b> {sender}\n"
-            f"💬 <b>پیام:</b> {text}"
-        )
-        send_telegram(notify)
-        print(f"New message from {sender}: {text}")
+        print("Starting Rubika listener...")
+        bot = Client(name=SESSION_PATH)
+
+        @bot.on_message_updates(filters.private)
+        def on_private_message(update: Update):
+            try:
+                sender = getattr(update, 'author_title', None) or "ناشناس"
+                text = getattr(update, 'text', None) or "[پیام بدون متن]"
+                notify = (
+                    f"📩 <b>پیام جدید در روبیکا</b>\n\n"
+                    f"👤 <b>از:</b> {sender}\n"
+                    f"💬 <b>پیام:</b> {text}"
+                )
+                send_telegram(notify)
+                print(f"New message from {sender}: {text}")
+            except Exception as e:
+                print(f"Error processing message: {e}")
+
+        send_telegram("✅ ربات وصل شد.")
+        bot.run()
+
     except Exception as e:
-        print(f"Error: {e}")
-
-
-send_telegram("✅ ربات روشن شد و در حال نظارت روبیکاست.")
-bot.run()
+        print(f"Connection lost: {e}")
+        print("Reconnecting in 5 seconds...")
+        time.sleep(5)
