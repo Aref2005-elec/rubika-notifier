@@ -1,12 +1,14 @@
 import asyncio
 import os
+import base64
 import requests
 from rubpy import Client, filters
 from rubpy.types import Update
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
-SESSION_NAME = os.environ.get("SESSION_NAME", "rubika_session")
+SESSION_DATA = os.environ.get("SESSION_DATA")
+SESSION_NAME = "rubika_session"
 
 
 def send_telegram(text):
@@ -21,7 +23,18 @@ def send_telegram(text):
         print(f"Telegram error: {e}")
 
 
+def load_session():
+    if SESSION_DATA:
+        session_bytes = base64.b64decode(SESSION_DATA)
+        with open(f"{SESSION_NAME}.rp", "wb") as f:
+            f.write(session_bytes)
+        print("Session loaded from environment variable.")
+    else:
+        print("No SESSION_DATA found!")
+
+
 async def main():
+    load_session()
     print("Starting Rubika listener...")
 
     bot = Client(name=SESSION_NAME)
