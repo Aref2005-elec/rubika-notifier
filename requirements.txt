@@ -1,2 +1,2 @@
-rubika
-requests
+rubpy
+requests=
