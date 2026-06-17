@@ -7,7 +7,7 @@ from rubpy.types import Update
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 SESSION_DATA = os.environ.get("SESSION_DATA")
-SESSION_NAME = "rubika_session"
+SESSION_PATH = "/app/rubika_session"
 
 
 def send_telegram(text):
@@ -25,17 +25,18 @@ def send_telegram(text):
 def load_session():
     if SESSION_DATA:
         session_bytes = base64.b64decode(SESSION_DATA)
-        with open(f"{SESSION_NAME}.rp", "wb") as f:
+        with open(f"{SESSION_PATH}.rp", "wb") as f:
             f.write(session_bytes)
-        print("Session loaded.")
+        print(f"Session saved to {SESSION_PATH}.rp")
     else:
         print("No SESSION_DATA found!")
+        exit(1)
 
 
 load_session()
 print("Starting Rubika listener...")
 
-bot = Client(name=SESSION_NAME)
+bot = Client(name=SESSION_PATH)
 
 
 @bot.on_message_updates(filters.private)
