@@ -1,4 +1,3 @@
-import asyncio
 import os
 import base64
 import requests
@@ -28,36 +27,32 @@ def load_session():
         session_bytes = base64.b64decode(SESSION_DATA)
         with open(f"{SESSION_NAME}.rp", "wb") as f:
             f.write(session_bytes)
-        print("Session loaded from environment variable.")
+        print("Session loaded.")
     else:
         print("No SESSION_DATA found!")
 
 
-async def main():
-    load_session()
-    print("Starting Rubika listener...")
+load_session()
+print("Starting Rubika listener...")
 
-    bot = Client(name=SESSION_NAME)
-
-    @bot.on_message_updates(filters.private)
-    async def on_private_message(update: Update):
-        try:
-            sender = getattr(update, 'author_title', None) or "ناشناس"
-            text = getattr(update, 'text', None) or "[پیام بدون متن]"
-
-            notify = (
-                f"📩 <b>پیام جدید در روبیکا</b>\n\n"
-                f"👤 <b>از:</b> {sender}\n"
-                f"💬 <b>پیام:</b> {text}"
-            )
-            send_telegram(notify)
-            print(f"New message from {sender}: {text}")
-        except Exception as e:
-            print(f"Error: {e}")
-
-    send_telegram("✅ ربات روشن شد و در حال نظارت روبیکاست.")
-    bot.run()
+bot = Client(name=SESSION_NAME)
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+@bot.on_message_updates(filters.private)
+def on_private_message(update: Update):
+    try:
+        sender = getattr(update, 'author_title', None) or "ناشناس"
+        text = getattr(update, 'text', None) or "[پیام بدون متن]"
+        notify = (
+            f"📩 <b>پیام جدید در روبیکا</b>\n\n"
+            f"👤 <b>از:</b> {sender}\n"
+            f"💬 <b>پیام:</b> {text}"
+        )
+        send_telegram(notify)
+        print(f"New message from {sender}: {text}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+send_telegram("✅ ربات روشن شد و در حال نظارت روبیکاست.")
+bot.run()
